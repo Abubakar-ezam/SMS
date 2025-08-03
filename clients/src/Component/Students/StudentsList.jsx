@@ -124,13 +124,13 @@ const StudentsList = () => {
                               setEditingStudent(student);
                               setIsFormOpen(true);
                             }}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="bg-indigo-200 p-2 rounded text-indigo-600 hover:text-indigo-900"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(student._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="bg-red-200 p-2 rounded text-red-600 hover:text-red-900"
                           >
                             Delete
                           </button>

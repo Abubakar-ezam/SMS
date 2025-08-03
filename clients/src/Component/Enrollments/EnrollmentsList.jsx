@@ -146,13 +146,13 @@ const EnrollmentsList = () => {
                               setEditingEnrollment(enrollment);
                               setIsFormOpen(true);
                             }}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className=" bg-indigo-200 p-2 rounded text-indigo-600 hover:text-indigo-900"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(enrollment._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="bg-red-200 p-2 rounded  text-red-600 hover:text-red-900"
                           >
                             Delete
                           </button>
