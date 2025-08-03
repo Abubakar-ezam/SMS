@@ -1,6 +1,40 @@
-const Class = require("../model/class");
+const Class = require("../model/Class");
 
-const createClass = async (req, res) => {
+exports.getAllClasses = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    const totalClasses = await Class.countDocuments(query);
+    const classes = await Class.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    res.json({
+      classes,
+      currentPage: page,
+      totalPages: Math.ceil(totalClasses / limit),
+      totalClasses,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.createClass = async (req, res) => {
   try {
     const newClass = new Class(req.body);
     await newClass.save();
@@ -10,54 +44,30 @@ const createClass = async (req, res) => {
   }
 };
 
-const getAllClasses = async (req, res) => {
-  try {
-    const classes = await Class.find();
-    res.json(classes);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const getClassById = async (req, res) => {
-  try {
-    const classDetail = await Class.findById(req.params.id);
-    if (!classDetail)
-      return res.status(404).json({ message: "Class not found" });
-    res.json(classDetail);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const updateClass = async (req, res) => {
+exports.updateClass = async (req, res) => {
   try {
     const updatedClass = await Class.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
+    if (!updatedClass) {
+      return res.status(404).json({ message: "Class not found" });
+    }
     res.json(updatedClass);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-const deleteClass = async (req, res) => {
+exports.deleteClass = async (req, res) => {
   try {
-    const classDetail = await Class.findByIdAndDelete(req.params.id);
-    if (!classDetail)
+    const deletedClass = await Class.findByIdAndDelete(req.params.id);
+    if (!deletedClass) {
       return res.status(404).json({ message: "Class not found" });
-    res.json({ message: "Class deleted" });
+    }
+    res.json({ message: "Class deleted successfully" });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
-};
-
-module.exports = {
-  createClass,
-  getAllClasses,
-  getClassById,
-  updateClass,
-  deleteClass,
 };

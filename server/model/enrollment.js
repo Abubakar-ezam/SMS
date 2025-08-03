@@ -1,15 +1,22 @@
 const mongoose = require("mongoose");
 
-const enrollmentSchema = new mongoose.Schema({
-  student: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",
-    required: true,
+const enrollmentSchema = new mongoose.Schema(
+  {
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: [true, "Student ID is required"],
+    },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+      required: [true, "Class ID is required"],
+    },
   },
-  class: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
-  enrollmentDate: { type: Date, default: Date.now },
-});
+  { timestamps: true }
+);
 
-const Enrollment = mongoose.model("Enrollment", enrollmentSchema);
+// Prevent duplicate enrollments
+enrollmentSchema.index({ studentId: 1, classId: 1 }, { unique: true });
 
-module.exports = Enrollment;
+module.exports = mongoose.model("Enrollment", enrollmentSchema);

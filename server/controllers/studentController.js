@@ -1,5 +1,6 @@
-const Student = require("../model/student");
+const Student = require("../model/Students");
 
+// Create Student
 const createStudent = async (req, res) => {
   try {
     const student = new Student(req.body);
@@ -10,15 +11,33 @@ const createStudent = async (req, res) => {
   }
 };
 
+// Get paginated + searched students
 const getAllStudents = async (req, res) => {
+  const { page = 1, limit = 10, search = "" } = req.query;
+
   try {
-    const students = await Student.find();
-    res.json(students);
+    const students = await Student.find({
+      name: { $regex: search, $options: "i" },
+    })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Student.countDocuments({
+      name: { $regex: search, $options: "i" },
+    });
+
+    res.json({
+      students,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: Number(page),
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+// Get by ID
 const getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -29,6 +48,7 @@ const getStudentById = async (req, res) => {
   }
 };
 
+// Update
 const updateStudent = async (req, res) => {
   try {
     const student = await Student.findByIdAndUpdate(req.params.id, req.body, {
@@ -40,6 +60,7 @@ const updateStudent = async (req, res) => {
   }
 };
 
+// Delete
 const deleteStudent = async (req, res) => {
   try {
     const student = await Student.findByIdAndDelete(req.params.id);
@@ -52,7 +73,7 @@ const deleteStudent = async (req, res) => {
 
 module.exports = {
   createStudent,
-  getAllStudents,
+  getAllStudents, // ✅ This now has pagination+search
   getStudentById,
   updateStudent,
   deleteStudent,
