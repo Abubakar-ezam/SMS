@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import WelcomePage from "./Pages/WelcomePage";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./Pages/Dashboard";
+import Login from "./Pages/Login";
+import Profile from "./Pages/Profile"; // Added Profile route
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,7 +12,9 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route path="/" element={<WelcomePage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} /> {/* Profile Route */}
       </Routes>
     </Router>
   );

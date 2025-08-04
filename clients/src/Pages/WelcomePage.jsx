@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const WelcomePage = () => {
-  const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(true);
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/login"); // Redirect to the login page
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-green-500">
@@ -31,7 +35,7 @@ const WelcomePage = () => {
 
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md"
-          onClick={() => navigate("/dashboard")}
+          onClick={handleGetStarted}
         >
           GET STARTED
         </button>

@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../Component/Layout/Sidebar";
 import StudentsList from "../Component/Students/StudentsList";
 import ClassesList from "../Component/Classes/ClassesList";
 import EnrollmentsList from "../Component/Enrollments/EnrollmentsList";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("students");
+  const navigate = useNavigate();
+
+  // Redirect if user is not admin
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role !== "admin") {
+      navigate("/profile"); // Redirect to profile page if not admin
+    }
+  }, [navigate]);
 
   const renderActiveTab = () => {
     switch (activeTab) {
