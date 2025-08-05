@@ -33,7 +33,7 @@ function Login({ onLogin }) {
       if (data.user.role === "admin") {
         navigate("/dashboard"); // Redirect to dashboard
       } else {
-        navigate("/profile"); // Redirect to user profile
+        navigate("/dashboard"); // Redirect to user profile
       }
     } catch (err) {
       alert("Login error");
@@ -80,7 +80,7 @@ function Login({ onLogin }) {
           type="submit"
           className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium px-4 py-3 rounded-lg w-full hover:shadow-lg transition-all hover:from-blue-600 hover:to-blue-700 active:scale-95"
         >
-          Login / Register
+          Login 
         </button>
       </form>
     </div>

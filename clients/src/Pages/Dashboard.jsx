@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "admin") {
-      navigate("/profile"); // Redirect to profile page if not admin
+      navigate("/dashboard"); // Redirect to profile page if not admin
     }
   }, [navigate]);
 

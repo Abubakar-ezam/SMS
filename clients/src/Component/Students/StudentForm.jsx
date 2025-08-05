@@ -1,6 +1,36 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+
+// Function to add a new student (POST)
+const addStudent = async (formData) => {
+  const response = await fetch("http://localhost:5000/api/students", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+  if (!response.ok) {
+    throw new Error("Error adding student");
+  }
+  return response.json();
+};
+
+// Function to update an existing student (PUT)
+const updateStudent = async ({ id, formData }) => {
+  const response = await fetch(`http://localhost:5000/api/students/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+  if (!response.ok) {
+    throw new Error("Error updating student");
+  }
+  return response.json();
+};
 
 const StudentForm = ({ student, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +38,8 @@ const StudentForm = ({ student, onClose, onSuccess }) => {
     email: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (student) {
@@ -25,26 +57,43 @@ const StudentForm = ({ student, onClose, onSuccess }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  // Mutations using mutationFn for React Query v4
+  const { mutate: createStudent } = useMutation({
+    mutationFn: addStudent,
+    onSuccess: () => {
+      toast.success("Student added successfully");
+      queryClient.invalidateQueries({ queryKey: ["students"] }); // Invalidate cache for students to trigger refetch
+      onSuccess();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error saving student");
+    },
+  });
+
+  const { mutate: editStudent } = useMutation({
+    mutationFn: updateStudent,
+    onSuccess: () => {
+      toast.success("Student updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      onSuccess();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error saving student");
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    try {
-      if (student) {
-        await axios.put(
-          `http://localhost:5000/api/students/${student._id}`,
-          formData
-        );
-        toast.success("Student updated successfully");
-      } else {
-        await axios.post("http://localhost:5000/api/students", formData);
-        toast.success("Student added successfully");
-      }
-      onSuccess();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Error saving student");
-    } finally {
-      setIsSubmitting(false);
+
+    if (student) {
+      // Update student if it's an existing student
+      editStudent({ id: student._id, formData });
+    } else {
+      // Create new student
+      createStudent(formData);
     }
+    setIsSubmitting(false);
   };
 
   return (
